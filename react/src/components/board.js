@@ -36,13 +36,14 @@ export function Board({ xIsNext, squares, onPlay }) {
             const isLight = (colX + rowY) % 2 === 0;
 
             // Access the 2D array naturally using columns and rows!
-            const pieceClass = squares[colX][rowY];
+            const piece = squares[colX][rowY];
+            console.log("piece: ", piece);
 
             return (
               <Square
                 key={`${colX}-${rowY}`}
                 cName={isLight ? "light" : "dark"}
-                value={pieceClass}
+                piece={piece}
                 onSquareClick={() => handleClick(colX, rowY)}
               />
             );
@@ -54,7 +55,7 @@ export function Board({ xIsNext, squares, onPlay }) {
 }
 
 // Square component
-function Square({ value, onSquareClick, cName }) {
+function Square({ piece, onSquareClick, cName }) {
   // Trial One, but now lift the state into the Board
   //
   // array destructiong to extract two items from useState hook.
@@ -76,7 +77,7 @@ function Square({ value, onSquareClick, cName }) {
 
   return (
     <button className={`square ${cName}`} onClick={onSquareClick}>
-      <div class={value}></div>
+      {piece && <div className={piece.className}></div>}
     </button>
   );
 }
