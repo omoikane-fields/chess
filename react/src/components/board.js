@@ -1,6 +1,6 @@
 // Board component
 // This represent the standard 8x8 chess board
-export function Board({ xIsNext, squares, onPlay }) {
+export function Board({ whiteIsNext, squares, onPlay }) {
   const width = 8;
   const height = 8;
 
@@ -9,7 +9,7 @@ export function Board({ xIsNext, squares, onPlay }) {
       return;
     }
     const nextSquares = squares.slice();
-    if (xIsNext) {
+    if (whiteIsNext) {
       nextSquares[i] = "chess-piece king-white";
     } else {
       nextSquares[i] = "chess-piece rook-black";
@@ -22,35 +22,38 @@ export function Board({ xIsNext, squares, onPlay }) {
   if (winner) {
     status = "Winner: " + winner;
   } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
+    status = "Next player: " + (whiteIsNext ? "White" : "Black");
   }
 
   const boardIndices = Array.from({ length: 8 }, (_, i) => i);
 
   return (
-    <div className="chess-board">
-      {boardIndices.map((rowY) => (
-        <div key={rowY} className="board-row" style={{ display: "flex" }}>
-          {boardIndices.map((colX) => {
-            // Determine light/dark square color alternating pattern
-            const isLight = (colX + rowY) % 2 === 0;
+    <>
+      <div className="status">{status}</div>
+      <div className="chess-board">
+        {boardIndices.map((rowY) => (
+          <div key={rowY} className="board-row" style={{ display: "flex" }}>
+            {boardIndices.map((colX) => {
+              // Determine light/dark square color alternating pattern
+              const isLight = (colX + rowY) % 2 === 0;
 
-            // Access the 2D array naturally using columns and rows!
-            const piece = squares[colX][rowY];
-            console.log("piece: ", piece);
+              // Access the 2D array naturally using columns and rows!
+              const piece = squares[colX][rowY];
+              console.log("piece: ", piece);
 
-            return (
-              <Square
-                key={`${colX}-${rowY}`}
-                cName={isLight ? "light" : "dark"}
-                piece={piece}
-                onSquareClick={() => handleClick(colX, rowY)}
-              />
-            );
-          })}
-        </div>
-      ))}
-    </div>
+              return (
+                <Square
+                  key={`${colX}-${rowY}`}
+                  cName={isLight ? "light" : "dark"}
+                  piece={piece}
+                  onSquareClick={() => handleClick(colX, rowY)}
+                />
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
