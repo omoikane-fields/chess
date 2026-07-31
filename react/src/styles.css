@@ -63,12 +63,12 @@ body {
   font-size: 24px;
   font-weight: bold;
   line-height: 34px;
-  height: 34px;
+  height: 80px;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
   text-align: center;
-  width: 34px;
+  width: 80px;
 }
 
 .board-row:after {
@@ -89,6 +89,72 @@ body {
   margin-left: 20px;
 }
 
-.even {
-  background-color: #eee;
+.light {
+  background-color: #fdc;
+}
+
+.dark {
+  background-color: #986;
+}
+
+
+/* TODO: split chess pieces into own styling */
+.chess-piece {
+  width: 80px;
+  height: 80px;
+  background-image: url('../public/images/chess-pieces.png');
+  background-repeat: no-repeat;
+  display: inline-block;
+
+  background-size: 480px 160px;
+}
+
+/* white pieces */
+.king-white {
+  background-position: 0px 0px;
+}
+
+.queen-white {
+  background-position: -80px 0px;
+}
+
+.bishop-white {
+  background-position: -160px 0px;
+}
+
+.knight-white {
+  background-position: -240px 0px;
+}
+
+.rook-white {
+  background-position: -320px 0px;
+}
+
+.pawn-white {
+  background-position: -400px 0px;
+}
+
+/* black pieces */
+.king-black {
+  background-position: 0px -80px;
+}
+
+.queen-black {
+  background-position: -80px -80px;
+}
+
+.bishop-black {
+  background-position: -160px -80px;
+}
+
+.knight-black {
+  background-position: -240px -80px;
+}
+
+.rook-black {
+  background-position: -320px -80px;
+}
+
+.pawn-black {
+  background-position: -400px -80px;
 }
