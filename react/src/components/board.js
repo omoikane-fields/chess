@@ -10,9 +10,9 @@ export function Board({ xIsNext, squares, onPlay }) {
     }
     const nextSquares = squares.slice();
     if (xIsNext) {
-      nextSquares[i] = "X";
+      nextSquares[i] = "chess-piece king-white";
     } else {
-      nextSquares[i] = "O";
+      nextSquares[i] = "chess-piece rook-black";
     }
     onPlay(nextSquares);
   }
@@ -25,31 +25,31 @@ export function Board({ xIsNext, squares, onPlay }) {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
-  return (
-    <>
-      <div className="status">{status}</div>
-      <div>
-        {[...Array(height)].map((_, row) => {
-          return (
-            <div key={row} className="board-row">
-              {[...Array(width)].map((_, col) => {
-                const index = row * width + col;
-                const remainder = row % 2 === 0 ? 0 : 1;
+  const boardIndices = Array.from({ length: 8 }, (_, i) => i);
 
-                return (
-                  <Square
-                    cName={index % 2 === remainder ? "light" : "dark"}
-                    key={index}
-                    value={squares[index]} // ✅ This now works: 'squares' exists in scope
-                    onSquareClick={() => handleClick(index)}
-                  />
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
-    </>
+  return (
+    <div className="chess-board">
+      {boardIndices.map((rowY) => (
+        <div key={rowY} className="board-row" style={{ display: "flex" }}>
+          {boardIndices.map((colX) => {
+            // Determine light/dark square color alternating pattern
+            const isLight = (colX + rowY) % 2 === 0;
+
+            // Access the 2D array naturally using columns and rows!
+            const pieceClass = squares[colX][rowY];
+
+            return (
+              <Square
+                key={`${colX}-${rowY}`}
+                cName={isLight ? "light" : "dark"}
+                value={pieceClass}
+                onSquareClick={() => handleClick(colX, rowY)}
+              />
+            );
+          })}
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -76,7 +76,7 @@ function Square({ value, onSquareClick, cName }) {
 
   return (
     <button className={`square ${cName}`} onClick={onSquareClick}>
-      {value}
+      <div class={value}></div>
     </button>
   );
 }
