@@ -10,6 +10,7 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "framer-motion": "^13.1.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-scripts": "^5.0.0"
@@ -20,8 +21,8 @@
     "react-scripts": "^5.0.0"
   },
   "browserslist": [
-  ">0.2%",
-  "not dead",
-  "not op_mini all"
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
   ]
 }

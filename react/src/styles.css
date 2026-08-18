@@ -158,3 +158,10 @@ body {
 .pawn-black {
   background-position: -400px -80px;
 }
+
+.ghost {
+  opacity: 0.5;
+
+  position: fixed;
+  z-index: 9999;
+}

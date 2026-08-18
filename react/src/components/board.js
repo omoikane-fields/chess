@@ -91,22 +91,67 @@ function Square({ piece, onSquareClick, cName }) {
 
 // <div className={piece.className}></div>
 function ChessPiece({ piece }) {
+  const [isSelected, setIsSelected] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const selectPiece = () => {
+    setIsSelected((prev) => !prev);
+  };
+
+  // Track mouse movement only when active
+  useEffect(() => {
+    if (!isSelected) return;
+
+    const handleMouseMove = (e) => {
+      // Center the div on the cursor (assuming 100x100 size)
+      setPosition({
+        x: e.clientX - 50,
+        y: e.clientY - 50,
+      });
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    return () => document.removeEventListener("mousemove", handleMouseMove);
+  }, [isSelected]);
+
   return (
-    <motion.div
-      animate={{ rotate: 0 }}
-      whileHover={{
-        rotate: [0, -10, 10, -10, 10, 0], // Defines the wiggle path
-      }}
-      transition={{
-        duration: 0.4, // Total time for one wiggle cycle
-        ease: "easeInOut",
-      }}
-      style={{
-        cursor: "pointer",
-      }}
-    >
-      <div className={piece.className}></div>
-    </motion.div>
+    <>
+      {!isSelected && (
+        <motion.div
+          animate={{ rotate: 0 }}
+          whileHover={{
+            rotate: [0, -10, 10, -10, 10, 0], // Defines the wiggle path
+          }}
+          transition={{
+            duration: 0.4, // Total time for one wiggle cycle
+            ease: "easeInOut",
+          }}
+          style={{
+            cursor: "pointer",
+          }}
+        >
+          <div
+            className={`${piece.className} new-class ${isSelected ? "ghost" : ""}`}
+            onClick={selectPiece}
+            style={{
+              left: `${position.x}px`,
+              top: `${position.y}px`,
+            }}
+          ></div>
+        </motion.div>
+      )}
+
+      {isSelected && (
+        <div
+          className={`${piece.className} new-class ${isSelected ? "ghost" : ""}`}
+          onClick={selectPiece}
+          style={{
+            left: `${position.x}px`,
+            top: `${position.y}px`,
+          }}
+        ></div>
+      )}
+    </>
   );
 }
 
