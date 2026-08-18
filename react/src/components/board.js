@@ -94,8 +94,18 @@ function ChessPiece({ piece }) {
   const [isSelected, setIsSelected] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
+  // Store the latest mouse coordinates globally
+  const mousePos = React.useRef({ x: 0, y: 0 });
+
   const selectPiece = () => {
-    setIsSelected((prev) => !prev);
+    if (!isSelected) {
+      // 1. Set position immediately to where the mouse is RIGHT NOW
+      setPosition(mousePos.current);
+      // 2. Activate
+      setIsSelected(true);
+    } else {
+      setIsSelected(false);
+    }
   };
 
   // Track mouse movement only when active
@@ -103,11 +113,15 @@ function ChessPiece({ piece }) {
     if (!isSelected) return;
 
     const handleMouseMove = (e) => {
-      // Center the div on the cursor (assuming 100x100 size)
-      setPosition({
-        x: e.clientX - 50,
+      mousePos.current = {
+        x: e.clientX - 50, // Center offset
         y: e.clientY - 50,
-      });
+      };
+
+      // Only update state for rendering if the ghost is active
+      if (isSelected) {
+        setPosition(mousePos.current);
+      }
     };
 
     document.addEventListener("mousemove", handleMouseMove);
