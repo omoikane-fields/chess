@@ -63,25 +63,6 @@ export function Board({ whiteIsNext, squares, onPlay }) {
 
 // Square component
 function Square({ piece, onSquareClick, cName }) {
-  // Trial One, but now lift the state into the Board
-  //
-  // array destructiong to extract two items from useState hook.
-  // value: a variable holding the current state.
-  // setValue: a function used to update the state, i.e. setValue(newData)
-  //
-  // useState(null), null is initial value of the state when component first renders.
-  // if y is used instead of null, the squares would display 'y'
-  // const [value, setValue] = useState();
-
-  // Before we lifted value into Board, we handled clicks per square.
-  // Moved to board.
-  //
-  // make this square interactive by providing a function.
-  // use html onclick to link to this function.
-  // function handleClick() {
-  //   setValue("X"); // setting to X for now, but this will change.
-  // }
-
   return (
     <button className={`square ${cName}`} onClick={onSquareClick}>
       {piece && <ChessPiece piece={piece} />}
@@ -94,14 +75,16 @@ function ChessPiece({ piece }) {
   const [isSelected, setIsSelected] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  // Store the latest mouse coordinates globally
-  const mousePos = React.useRef({ x: 0, y: 0 });
+  const dragOffset = useRef({ x: 0, y: 0 });
 
-  const selectPiece = () => {
+  const selectPiece = (e) => {
     if (!isSelected) {
-      // 1. Set position immediately to where the mouse is RIGHT NOW
-      setPosition(mousePos.current);
-      // 2. Activate
+      const rect = e.currentTarget.getBoundingClientRect();
+      dragOffset.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+      setPosition({ x: rect.left, y: rect.top });
       setIsSelected(true);
     } else {
       setIsSelected(false);
@@ -113,15 +96,10 @@ function ChessPiece({ piece }) {
     if (!isSelected) return;
 
     const handleMouseMove = (e) => {
-      mousePos.current = {
-        x: e.clientX - 50, // Center offset
-        y: e.clientY - 50,
-      };
-
-      // Only update state for rendering if the ghost is active
-      if (isSelected) {
-        setPosition(mousePos.current);
-      }
+      setPosition({
+        x: e.clientX - dragOffset.current.x,
+        y: e.clientY - dragOffset.current.y,
+      });
     };
 
     document.addEventListener("mousemove", handleMouseMove);
