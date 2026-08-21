@@ -97,6 +97,11 @@ body {
   background-color: #998866;
 }
 
+.selected {
+  outline: 4px solid rgba(255, 215, 0, 0.8);
+  outline-offset: -4px;
+}
+
 
 /* TODO: split chess pieces into own styling */
 .chess-piece {
@@ -164,4 +169,5 @@ body {
 
   position: fixed;
   z-index: 9999;
+  pointer-events: none;
 }

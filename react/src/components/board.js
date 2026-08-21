@@ -6,18 +6,39 @@ import React, { useState, useRef, useEffect } from "react";
 export function Board({ currentColor, squares, onPlay }) {
   const width = 8;
   const height = 8;
+  const [selectedSquare, setSelectedSquare] = useState(null);
 
-  function handleClick(i) {
-    if (calculateWinner(squares) || squares[i]) {
+  function handleSquareClick(position) {
+    if (calculateWinner(squares)) {
       return;
     }
-    const nextSquares = squares.slice();
-    if (whiteIsNext) {
-      nextSquares[i] = "chess-piece king-white";
-    } else {
-      nextSquares[i] = "chess-piece rook-black";
+
+    if (!selectedSquare) {
+      const piece = squares[position.x][position.y];
+      if (piece && piece.color === currentColor) {
+        setSelectedSquare(position);
+      }
+      return;
     }
+
+    // This puts the piece back to same square if clicked again.
+    if (selectedSquare.x === position.x && selectedSquare.y === position.y) {
+      setSelectedSquare(null);
+      return;
+    }
+
+    // Prevents moving to a square that already has a piece on it.
+    // TODO: Implement capturing logic in the future.
+    if (squares[position.x][position.y]) {
+      return;
+    }
+
+    const nextSquares = squares.map((column) => column.slice());
+    nextSquares[position.x][position.y] =
+      nextSquares[selectedSquare.x][selectedSquare.y];
+    nextSquares[selectedSquare.x][selectedSquare.y] = null;
     onPlay(nextSquares);
+    setSelectedSquare(null);
   }
 
   const winner = calculateWinner(squares);
@@ -25,7 +46,7 @@ export function Board({ currentColor, squares, onPlay }) {
   if (winner) {
     status = "Winner: " + winner;
   } else {
-    status = "Next player: " + (whiteIsNext ? "White" : "Black");
+    status = "Next player: " + (currentColor === "white" ? "White" : "Black");
   }
 
   const boardIndices = Array.from({ length: 8 }, (_, i) => i);
@@ -49,8 +70,12 @@ export function Board({ currentColor, squares, onPlay }) {
                   key={`${colX}-${rowY}`}
                   cName={isLight ? "light" : "dark"}
                   piece={piece}
-                  whiteIsNext={whiteIsNext}
-                  onSquareClick={() => handleClick(colX, rowY)}
+                  position={{ x: colX, y: rowY }}
+                  currentColor={currentColor}
+                  isSelected={
+                    selectedSquare?.x === colX && selectedSquare?.y === rowY
+                  }
+                  onSquareClick={handleSquareClick}
                 />
               );
             })}
@@ -62,34 +87,48 @@ export function Board({ currentColor, squares, onPlay }) {
 }
 
 // Square component
-function Square({ piece, whiteIsNext, onSquareClick, cName }) {
+function Square({
+  piece,
+  position,
+  currentColor,
+  isSelected,
+  onSquareClick,
+  cName,
+}) {
   return (
-    <button className={`square ${cName}`} onClick={onSquareClick}>
-      {piece && <ChessPiece piece={piece} whiteIsNext={whiteIsNext} />}
+    <button
+      className={`square ${cName} ${isSelected ? "selected" : ""}`}
+      onClick={() => onSquareClick(position)}
+    >
+      {piece && (
+        <ChessPiece
+          piece={piece}
+          canInteract={piece.color === currentColor}
+          isSelected={isSelected}
+          onSelect={(event) => {
+            event.stopPropagation();
+            onSquareClick(position);
+          }}
+        />
+      )}
     </button>
   );
 }
 
 // <div className={piece.className}></div>
-function ChessPiece({ whiteIsNext, piece }) {
-  const [isSelected, setIsSelected] = useState(false);
+function ChessPiece({ piece, canInteract, isSelected, onSelect }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const canInteract = (piece.color === "white") === whiteIsNext;
 
   const dragOffset = useRef({ x: 0, y: 0 });
 
   const selectPiece = (e) => {
-    if (!isSelected) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      dragOffset.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
-      setPosition({ x: rect.left, y: rect.top });
-      setIsSelected(true);
-    } else {
-      setIsSelected(false);
-    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    dragOffset.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+    setPosition({ x: rect.left, y: rect.top });
+    onSelect(e);
   };
 
   // Track mouse movement only when active
