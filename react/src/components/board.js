@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 
 // Board component
 // This represent the standard 8x8 chess board
-export function Board({ whiteIsNext, squares, onPlay }) {
+export function Board({ currentColor, squares, onPlay }) {
   const width = 8;
   const height = 8;
 
