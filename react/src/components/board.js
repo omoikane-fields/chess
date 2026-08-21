@@ -56,7 +56,6 @@ export function Board({ whiteIsNext, squares, onPlay }) {
           </div>
         ))}
       </div>
-      <ToggleDrag />
     </>
   );
 }
@@ -167,86 +166,4 @@ function calculateWinner(squares) {
     }
   }
   return null;
-}
-
-export default function ToggleDrag() {
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 50, y: 50 });
-  const dragRef = useRef(null);
-  const offset = useRef({ x: 0, y: 0 });
-
-  // Handle the initial click to START dragging
-  const handleMouseDown = (e) => {
-    if (isDragging) return; // Already dragging, ignore
-
-    // Calculate offset to prevent snapping to top-left
-    if (dragRef.current) {
-      const rect = dragRef.current.getBoundingClientRect();
-      offset.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
-    }
-
-    setIsDragging(true);
-  };
-
-  // Handle the second click to STOP dragging
-  const handleClick = () => {
-    if (isDragging) {
-      setIsDragging(false);
-    }
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!isDragging) return;
-      setPosition({
-        x: e.clientX - offset.current.x,
-        y: e.clientY - offset.current.y,
-      });
-    };
-
-    // Attach global listeners only when dragging is active
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      // We listen for 'click' globally to catch the "stop" click anywhere
-      document.addEventListener("click", handleClick, { once: true });
-    }
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("click", handleClick);
-    };
-  }, [isDragging]);
-
-  return (
-    <div
-      ref={dragRef}
-      onMouseDown={handleMouseDown}
-      style={{
-        position: "absolute",
-        left: position.x,
-        top: position.y,
-        width: 120,
-        height: 120,
-        backgroundColor: isDragging ? "#FF5722" : "#2196F3",
-        cursor: isDragging ? "grabbing" : "grab",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "white",
-        fontWeight: "bold",
-        userSelect: "none",
-        boxShadow: isDragging
-          ? "0 10px 20px rgba(0,0,0,0.2)"
-          : "0 4px 6px rgba(0,0,0,0.1)",
-        borderRadius: 8,
-        zIndex: isDragging ? 1000 : 1,
-        transition: isDragging ? "none" : "background 0.2s",
-      }}
-    >
-      {isDragging ? "Click to Drop" : "Click to Drag"}
-    </div>
-  );
 }
