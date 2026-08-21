@@ -49,6 +49,7 @@ export function Board({ whiteIsNext, squares, onPlay }) {
                   key={`${colX}-${rowY}`}
                   cName={isLight ? "light" : "dark"}
                   piece={piece}
+                  whiteIsNext={whiteIsNext}
                   onSquareClick={() => handleClick(colX, rowY)}
                 />
               );
@@ -61,18 +62,19 @@ export function Board({ whiteIsNext, squares, onPlay }) {
 }
 
 // Square component
-function Square({ piece, onSquareClick, cName }) {
+function Square({ piece, whiteIsNext, onSquareClick, cName }) {
   return (
     <button className={`square ${cName}`} onClick={onSquareClick}>
-      {piece && <ChessPiece piece={piece} />}
+      {piece && <ChessPiece piece={piece} whiteIsNext={whiteIsNext} />}
     </button>
   );
 }
 
 // <div className={piece.className}></div>
-function ChessPiece({ piece }) {
+function ChessPiece({ whiteIsNext, piece }) {
   const [isSelected, setIsSelected] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const canInteract = (piece.color === "white") === whiteIsNext;
 
   const dragOffset = useRef({ x: 0, y: 0 });
 
@@ -92,7 +94,7 @@ function ChessPiece({ piece }) {
 
   // Track mouse movement only when active
   useEffect(() => {
-    if (!isSelected) return;
+    if (!isSelected || !canInteract) return;
 
     const handleMouseMove = (e) => {
       setPosition({
@@ -103,46 +105,23 @@ function ChessPiece({ piece }) {
 
     document.addEventListener("mousemove", handleMouseMove);
     return () => document.removeEventListener("mousemove", handleMouseMove);
-  }, [isSelected]);
+  }, [canInteract, isSelected]);
 
   return (
-    <>
-      {!isSelected && (
-        <motion.div
-          animate={{ rotate: 0 }}
-          whileHover={{
-            rotate: [0, -10, 10, -10, 10, 0], // Defines the wiggle path
-          }}
-          transition={{
-            duration: 0.4, // Total time for one wiggle cycle
-            ease: "easeInOut",
-          }}
-          style={{
-            cursor: "pointer",
-          }}
-        >
-          <div
-            className={`${piece.className} new-class ${isSelected ? "ghost" : ""}`}
-            onClick={selectPiece}
-            style={{
-              left: `${position.x}px`,
-              top: `${position.y}px`,
-            }}
-          ></div>
-        </motion.div>
-      )}
-
-      {isSelected && (
-        <div
-          className={`${piece.className} new-class ${isSelected ? "ghost" : ""}`}
-          onClick={selectPiece}
-          style={{
-            left: `${position.x}px`,
-            top: `${position.y}px`,
-          }}
-        ></div>
-      )}
-    </>
+    <motion.div
+      animate={{ rotate: 0 }}
+      whileHover={
+        canInteract ? { rotate: [0, -10, 10, -10, 10, 0] } : undefined
+      }
+      transition={{ duration: 0.4, ease: "easeInOut" }}
+      className={`${piece.className} new-class ${isSelected ? "ghost" : ""}`}
+      onClick={canInteract ? selectPiece : undefined}
+      style={{
+        cursor: canInteract ? "pointer" : "default",
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+      }}
+    ></motion.div>
   );
 }
 
