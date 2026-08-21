@@ -8,7 +8,7 @@ export default function Game() {
   // history will store all 64 squares
   const [history, setHistory] = useState(() => [getStartingBoard()]);
   const [currentMove, setCurrentMove] = useState(0);
-  const whiteIsNext = currentMove % 2 === 0;
+  const currentColor = currentMove % 2 === 0 ? "white" : "black";
   const currentSquares = history[currentMove];
 
   function handlePlay(nextSquares) {
@@ -39,7 +39,7 @@ export default function Game() {
     <div className="game">
       <div className="game-board">
         <Board
-          whiteIsNext={whiteIsNext}
+          currentColor={currentColor}
           squares={currentSquares}
           onPlay={handlePlay}
         />
