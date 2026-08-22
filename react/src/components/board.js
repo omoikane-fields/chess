@@ -1,31 +1,50 @@
 import { motion } from "framer-motion";
 import React, { useState, useRef, useEffect } from "react";
+import { getCandidateMoves } from "../objects/pieces.js";
 
 // Board component
 // This represent the standard 8x8 chess board
-export function Board({ currentColor, squares, onPlay }) {
+export function Board({ currentColor, squares, recordMove }) {
   const width = 8;
   const height = 8;
   const [selectedSquare, setSelectedSquare] = useState(null);
+  const [availableMoves, setAvailableMoves] = useState([]);
 
   function handleSquareClick(position) {
     if (calculateWinner(squares)) {
       return;
     }
+    const piece = squares[position.x][position.y];
 
     if (!selectedSquare) {
-      const piece = squares[position.x][position.y];
-      if (piece && piece.color === currentColor) {
+      if (piece?.color === currentColor) {
+        const availableMoves = getCandidateMoves(squares, piece, position, {
+          currentColor,
+        });
+
         setSelectedSquare(position);
+        setAvailableMoves(availableMoves);
+
+        return;
       }
+
+      // no piece is selected. User clicked on square with no piece or opponent's piece. Do nothing.
       return;
     }
 
     // This puts the piece back to same square if clicked again.
     if (selectedSquare.x === position.x && selectedSquare.y === position.y) {
+      setAvailableMoves([]); // clear available moves when deselecting
       setSelectedSquare(null);
       return;
     }
+
+    // varify can move to the square
+    const canMove = availableMoves.some(
+      (move) => move.to.x === position.x && move.to.y === position.y,
+    );
+    // do nothing. the piece won't move.
+    if (!canMove) return;
 
     // Prevents moving to a square that already has a piece on it.
     // TODO: Implement capturing logic in the future.
@@ -34,10 +53,19 @@ export function Board({ currentColor, squares, onPlay }) {
     }
 
     const nextSquares = squares.map((column) => column.slice());
-    nextSquares[position.x][position.y] =
-      nextSquares[selectedSquare.x][selectedSquare.y];
+    // TODO: would be nice to store held piece.
+    const movingPiece = nextSquares[selectedSquare.x][selectedSquare.y];
+    const movedPiece = Object.assign(
+      Object.create(Object.getPrototypeOf(movingPiece)),
+      movingPiece,
+      { hasMoved: true, position },
+    );
+
+    nextSquares[position.x][position.y] = movedPiece;
     nextSquares[selectedSquare.x][selectedSquare.y] = null;
-    onPlay(nextSquares);
+
+    recordMove(nextSquares);
+    setAvailableMoves([]);
     setSelectedSquare(null);
   }
 
@@ -63,7 +91,9 @@ export function Board({ currentColor, squares, onPlay }) {
 
               // Access the 2D array naturally using columns and rows!
               const piece = squares[colX][rowY];
-              console.log("piece: ", piece);
+              const isHighlight = availableMoves.some(
+                (move) => move.to.x === colX && move.to.y === rowY,
+              );
 
               return (
                 <Square
@@ -76,6 +106,7 @@ export function Board({ currentColor, squares, onPlay }) {
                     selectedSquare?.x === colX && selectedSquare?.y === rowY
                   }
                   onSquareClick={handleSquareClick}
+                  isHighlight={isHighlight}
                 />
               );
             })}
@@ -94,10 +125,11 @@ function Square({
   isSelected,
   onSquareClick,
   cName,
+  isHighlight,
 }) {
   return (
     <button
-      className={`square ${cName} ${isSelected ? "selected" : ""}`}
+      className={`square ${cName} ${isSelected ? "selected" : ""} ${isHighlight ? "highlight" : ""}`}
       onClick={() => onSquareClick(position)}
     >
       {piece && (

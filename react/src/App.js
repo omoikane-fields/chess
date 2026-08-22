@@ -2,6 +2,7 @@
 // This will allow us to keep track of state.
 import { useState } from "react";
 import { Board } from "./components/board";
+import { ChessPiece } from "./objects/pieces.js";
 
 export default function Game() {
   // TODO: is there a way to get board size, or do we prop that down?
@@ -11,7 +12,7 @@ export default function Game() {
   const currentColor = currentMove % 2 === 0 ? "white" : "black";
   const currentSquares = history[currentMove];
 
-  function handlePlay(nextSquares) {
+  function recordMove(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
@@ -41,7 +42,7 @@ export default function Game() {
         <Board
           currentColor={currentColor}
           squares={currentSquares}
-          onPlay={handlePlay}
+          recordMove={recordMove}
         />
       </div>
       <div className="game-info">
@@ -77,15 +78,4 @@ function getStartingBoard() {
   }
 
   return board;
-}
-
-class ChessPiece {
-  constructor(type, color) {
-    this.type = type; // e.g. queen
-    this.color = color; // e.g. white
-    this.hasMoved = false; // e.g. castling, pawn rules
-
-    // CSS class name
-    this.className = `chess-piece ${type}-${color}`;
-  }
 }
