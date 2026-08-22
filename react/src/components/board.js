@@ -54,9 +54,9 @@ export function Board({ currentColor, squares, onPlay }) {
   return (
     <>
       <div className="status">{status}</div>
-      <div className="chess-board">
+      <div className="chess-board diamond-border">
         {boardIndices.map((rowY) => (
-          <div key={rowY} className="board-row" style={{ display: "flex" }}>
+          <div key={rowY} className="board-row">
             {boardIndices.map((colX) => {
               // Determine light/dark square color alternating pattern
               const isLight = (colX + rowY) % 2 === 0;

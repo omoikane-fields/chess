@@ -48,7 +48,7 @@ ul {
 
 .square {
   background: #fff;
-  border: 1px solid #999;
+  border: 1px solid #655a44;
   float: left;
   font-size: 24px;
   font-weight: bold;
@@ -70,10 +70,34 @@ ul {
 .status {
   margin-bottom: 10px;
 }
+
 .game {
   display: flex;
   flex-direction: row;
   margin: 20px;
+}
+
+.chess-board {
+  position: relative;
+  padding:3px;
+}
+
+.diamond-border {
+   /* 1. The diamond border (middle layer) */
+  border: 20px solid transparent;
+  border-image: url("../public/images/border-diamonds.png") 30 round;
+  background-color: #998866;
+
+  /* 3. Outer solid line (outside the diamonds) */
+  /*    Separate shadow, no inset = outside */
+  /*    You must add margin to make room for the outer shadow */
+  box-shadow:
+    inset 0 0 0 3px #998866,   /* Inner line */
+    0 0 0 3px #998866;         /* Outer line */
+}
+
+.board-row {
+  display: flex;
 }
 
 .game-info {
