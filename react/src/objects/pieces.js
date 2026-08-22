@@ -85,6 +85,24 @@ function pawnCaptures({ board, piece, from, direction }) {
     .map((to) => move(from, to, "capture"));
 }
 
+function enpassantCapture({ board, piece, from, direction, gameState }) {
+  const lastMove = gameState.lastMove;
+  if (!lastMove) return [];
+
+  const lastMovedPiece = board[lastMove.to.x][lastMove.to.y];
+  if (!lastMovedPiece || lastMovedPiece.type !== "pawn") return [];
+
+  // Check if the last move was a double-step pawn move
+  if (lastMove.special !== "double-step") return [];
+
+  // Check if the last moved pawn is adjacent to the current pawn
+  if (Math.abs(lastMove.to.x - from.x) !== 1 || lastMove.to.y !== from.y)
+    return [];
+
+  const to = { x: lastMove.to.x, y: from.y + direction };
+  return isInsideBoard(to) ? [move(from, to, "en-passant")] : [];
+}
+
 /*
  * Rook Movement Logic
  */
@@ -156,7 +174,12 @@ function lShapeMoves({ board, piece, from }) {
 
 const bishopMoves = composeMoves(diagonalRay);
 const queenMoves = composeMoves(orthogonalRay, diagonalRay);
-const pawnMoves = composeMoves(pawnSingleStep, pawnDoubleStep, pawnCaptures);
+const pawnMoves = composeMoves(
+  pawnSingleStep,
+  pawnDoubleStep,
+  pawnCaptures,
+  enpassantCapture,
+);
 const rookMoves = composeMoves(orthogonalRay);
 const knightMoves = composeMoves(lShapeMoves);
 const kingMoves = (context) =>

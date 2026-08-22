@@ -4,7 +4,7 @@ import { getCandidateMoves } from "../objects/pieces.js";
 
 // Board component
 // This represent the standard 8x8 chess board
-export function Board({ currentColor, squares, recordMove }) {
+export function Board({ currentColor, squares, lastMove, recordMove }) {
   const width = 8;
   const height = 8;
   const [selectedSquare, setSelectedSquare] = useState(null);
@@ -20,6 +20,7 @@ export function Board({ currentColor, squares, recordMove }) {
       if (piece?.color === currentColor) {
         const availableMoves = getCandidateMoves(squares, piece, position, {
           currentColor,
+          lastMove,
         });
 
         setSelectedSquare(position);
@@ -40,15 +41,17 @@ export function Board({ currentColor, squares, recordMove }) {
     }
 
     // varify can move to the square
-    const canMove = availableMoves.some(
+    const selectedMove = availableMoves.find(
       (move) => move.to.x === position.x && move.to.y === position.y,
     );
     // do nothing. the piece won't move.
-    if (!canMove) return;
+    if (!selectedMove) return;
 
-    // Prevents moving to a square that already has a piece on it.
-    // TODO: Implement capturing logic in the future.
-    if (squares[position.x][position.y]) {
+    // En passant lands on an empty square and removes the adjacent pawn.
+    if (
+      selectedMove.special !== "en-passant" &&
+      squares[position.x][position.y]
+    ) {
       return;
     }
 
@@ -64,7 +67,11 @@ export function Board({ currentColor, squares, recordMove }) {
     nextSquares[position.x][position.y] = movedPiece;
     nextSquares[selectedSquare.x][selectedSquare.y] = null;
 
-    recordMove(nextSquares);
+    if (selectedMove.special === "en-passant") {
+      nextSquares[position.x][selectedSquare.y] = null;
+    }
+
+    recordMove(nextSquares, selectedMove);
     setAvailableMoves([]);
     setSelectedSquare(null);
   }

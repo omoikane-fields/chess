@@ -8,13 +8,17 @@ export default function Game() {
   // TODO: is there a way to get board size, or do we prop that down?
   // history will store all 64 squares
   const [history, setHistory] = useState(() => [getStartingBoard()]);
+  const [moveHistory, setMoveHistory] = useState([]);
   const [currentMove, setCurrentMove] = useState(0);
   const currentColor = currentMove % 2 === 0 ? "white" : "black";
   const currentSquares = history[currentMove];
+  const lastMove = moveHistory[currentMove - 1] ?? null;
 
-  function recordMove(nextSquares) {
+  function recordMove(nextSquares, move) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    const nextMoveHistory = [...moveHistory.slice(0, currentMove), move];
     setHistory(nextHistory);
+    setMoveHistory(nextMoveHistory);
     setCurrentMove(nextHistory.length - 1);
   }
 
@@ -42,6 +46,7 @@ export default function Game() {
         <Board
           currentColor={currentColor}
           squares={currentSquares}
+          lastMove={lastMove}
           recordMove={recordMove}
         />
       </div>
