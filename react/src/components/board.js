@@ -16,6 +16,7 @@ export function Board({ currentColor, squares, lastMove, recordMove }) {
     }
     const piece = squares[position.x][position.y];
 
+    // don't have a piece selected.
     if (!selectedSquare) {
       if (piece?.color === currentColor) {
         const availableMoves = getCandidateMoves(squares, piece, position, {
@@ -44,16 +45,9 @@ export function Board({ currentColor, squares, lastMove, recordMove }) {
     const selectedMove = availableMoves.find(
       (move) => move.to.x === position.x && move.to.y === position.y,
     );
+
     // do nothing. the piece won't move.
     if (!selectedMove) return;
-
-    // En passant lands on an empty square and removes the adjacent pawn.
-    if (
-      selectedMove.special !== "en-passant" &&
-      squares[position.x][position.y]
-    ) {
-      return;
-    }
 
     const nextSquares = squares.map((column) => column.slice());
     // TODO: would be nice to store held piece.
@@ -64,7 +58,10 @@ export function Board({ currentColor, squares, lastMove, recordMove }) {
       { hasMoved: true, position },
     );
 
+    // place the piece in the new square (this will overwrite any piece that was there, which is correct for captures)
+    // TODO: might be nice to have a capture method, so removed pieces can be shown.
     nextSquares[position.x][position.y] = movedPiece;
+    // remove the piece from the original square
     nextSquares[selectedSquare.x][selectedSquare.y] = null;
 
     if (selectedMove.special === "en-passant") {
