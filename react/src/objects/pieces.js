@@ -21,20 +21,6 @@ const moves = {
 const WHITE_DIRECTION = -1; // y 0 is at the top
 const BLACK_DIRECTION = 1;
 
-// export function createPawn(color, startPos) {
-//   const direction = color === "white" ? WHITE_DIRECTION : BLACK_DIRECTION;
-//   const piece = new ChessPiece("pawn", color, startPos);
-
-//   piece.canMove = (start, end) => {
-//     return (
-//       moves.oneStep(start, end, direction) ||
-//       moves.twoStep(start, end, direction, piece.hasMoved)
-//     );
-//   };
-
-//   return piece;
-// }
-
 export class ChessPiece {
   constructor(type, color, position) {
     this.type = type; // e.g. queen
@@ -126,6 +112,14 @@ function followDirection({ board, piece, from, direction, limit = Infinity }) {
 
   return moves;
 }
+
+/*
+ * TODO:
+ * - check if moving any piece would put the king in check.
+ * - check if king is already in check (followed by checkmate)
+ *   - if king is in check, only allow moves that would get the king out of check.
+ *
+ */
 
 function orthogonalRay({ board, piece, from, limit }) {
   const directions = [
