@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import React, { useState, useRef, useEffect } from "react";
 import { getCandidateMoves } from "../objects/pieces.js";
 
@@ -183,20 +182,20 @@ function ChessPiece({ piece, canInteract, isSelected, onSelect }) {
   }, [canInteract, isSelected]);
 
   return (
-    <motion.div
+    <div
       animate={{ rotate: 0 }}
       whileHover={
         canInteract ? { rotate: [0, -10, 10, -10, 10, 0] } : undefined
       }
       transition={{ duration: 0.4, ease: "easeInOut" }}
-      className={`${piece.className} new-class ${isSelected ? "ghost" : ""}`}
+      className={`${piece.className} ${isSelected ? "ghost" : ""} ${canInteract ? "wiggle-element" : ""}`}
       onClick={canInteract ? selectPiece : undefined}
       style={{
         cursor: canInteract ? "pointer" : "default",
         left: `${position.x}px`,
         top: `${position.y}px`,
       }}
-    ></motion.div>
+    ></div>
   );
 }
 

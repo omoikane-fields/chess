@@ -191,3 +191,16 @@ ul {
   z-index: 9999;
   pointer-events: none;
 }
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg);}
+  16% { transform: rotate(-7deg); }
+  33% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  66% { transform: rotate(7deg); }
+  80% { transform: rotate(-7deg); }
+}
+
+.wiggle-element:hover {
+  animation: wiggle 1.0s ease-in-out infinite;
+}
