@@ -153,8 +153,8 @@ function Square({
 // <div className={piece.className}></div>
 function ChessPiece({ piece, canInteract, isSelected, onSelect }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
-
   const dragOffset = useRef({ x: 0, y: 0 });
+  const [ghostSize, setGhostSize] = useState(null); // for responsive design
 
   const selectPiece = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -163,6 +163,7 @@ function ChessPiece({ piece, canInteract, isSelected, onSelect }) {
       y: e.clientY - rect.top,
     };
     setPosition({ x: rect.left, y: rect.top });
+    setGhostSize(rect.width);
     onSelect(e);
   };
 
@@ -194,6 +195,8 @@ function ChessPiece({ piece, canInteract, isSelected, onSelect }) {
         cursor: canInteract ? "pointer" : "default",
         left: `${position.x}px`,
         top: `${position.y}px`,
+        width: ghostSize,
+        height: ghostSize,
       }}
     ></div>
   );
