@@ -34,8 +34,10 @@ export default function Game() {
       description = "Go to game start";
     }
     return (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{description}</button>
+      <li class="btn-history-wrapper" key={move}>
+        <button class="btn-history" onClick={() => jumpTo(move)}>
+          <span>{description}</span>
+        </button>
       </li>
     );
   });
@@ -51,7 +53,9 @@ export default function Game() {
         />
       </div>
       <div className="game-info">
-        <ol>{moves}</ol>
+        <div class="scroll-box">
+          <ol class="history-list">{moves}</ol>
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,9 @@
+:root {
+  --color-board-light: #ffeedd;
+  --color-board-dark: #998866;
+  --color-board-shadow: #655a44;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -42,22 +48,14 @@ code {
   font-size: 1.2em;
 }
 
-ul {
-  padding-inline-start: 20px;
-}
-
 .square {
-  background: #fff;
-  border: 1px solid #655a44;
-  float: left;
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 34px;
+  display: inline-block;
+  overflow: visible;
+  border: 1px solid var(--color-board-shadow);
   height: 80px;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
-  text-align: center;
   width: 80px;
 }
 
@@ -74,6 +72,7 @@ ul {
 .game {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   margin: 20px;
 }
 
@@ -86,14 +85,14 @@ ul {
    /* 1. The diamond border (middle layer) */
   border: 20px solid transparent;
   border-image: url("../public/images/border-diamonds.png") 30 round;
-  background-color: #998866;
+  background-color: var(--color-board-dark);
 
   /* 3. Outer solid line (outside the diamonds) */
   /*    Separate shadow, no inset = outside */
   /*    You must add margin to make room for the outer shadow */
   box-shadow:
-    inset 0 0 0 3px #998866,   /* Inner line */
-    0 0 0 3px #998866;         /* Outer line */
+    inset 0 0 0 3px var(--color-board-dark),   /* Inner line */
+    0 0 0 3px var(--color-board-dark);         /* Outer line */
 }
 
 .board-row {
@@ -105,21 +104,23 @@ ul {
 }
 
 .light {
-  background-color: #ffeedd;
+  background-color: var(--color-board-light);
 }
 
 .dark {
-  background-color: #998866;
+  background-color: var(--color-board-dark);
 }
 
 .selected {
-  outline: 4px solid rgba(255, 215, 0, 0.8);
-  outline-offset: -4px;
+  box-shadow:
+    inset 0 0 4px 4px rgba(255, 215, 0, 0.8),
+    inset 0 0 4px 8px rgba(255, 215, 0, 0.3);
 }
 
 .highlight {
-  outline: 4px solid rgba(0, 255, 0, 0.8);
-  outline-offset: -4px;
+  box-shadow:
+    inset 0 0 4px 4px rgba(0, 255, 0, 0.8),
+    inset 0 0 4px 8px rgba(0, 255, 0, 0.3);
 }
 
 
@@ -203,4 +204,92 @@ ul {
 
 .wiggle-element:hover {
   animation: wiggle 1.0s ease-in-out infinite;
+}
+
+/*
+* History styling
+*/
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  padding: 20px;
+}
+
+.btn-history {
+  background-color: var(--color-board-dark);
+  border: 2px solid var(--color-board-shadow);
+  padding: 8px 16px;
+  color: white;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-history span {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-history:hover {
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.5);
+  color: white;
+}
+
+.btn-history::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-board-shadow);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.btn-history:hover::before {
+  transform: scaleX(1);
+}
+
+.btn-history:active {
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+/*
+* Scroll bar styling
+*/
+.scroll-box {
+  width: 300px;
+  height: 300px;
+  overflow: auto;
+  border: 5px solid var(--color-board-dark); /* todo: change */
+  background: var(--color-board-light)
+}
+
+/* Overall scrollbar size */
+.scroll-box::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* The draggable thumb */
+.scroll-box::-webkit-scrollbar-thumb {
+  background: var(--color-board-dark);
+  border-radius: 5px;
+}
+
+/* The track behind the thumb */
+.scroll-box::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+/* Optional: arrow buttons */
+.scroll-box::-webkit-scrollbar-button {
+  display: none; /* hide arrows for a cleaner look */
+}
+
+/* Optional: corner where two scrollbars meet */
+.scroll-box::-webkit-scrollbar-corner {
+  background: transparent;
 }
