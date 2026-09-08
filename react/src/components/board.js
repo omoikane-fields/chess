@@ -154,7 +154,23 @@ function Square({
 function ChessPiece({ piece, canInteract, isSelected, onSelect }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const dragOffset = useRef({ x: 0, y: 0 });
-  const [ghostSize, setGhostSize] = useState(null); // for responsive design
+  const pieceRef = useRef(null);
+  const [ghostSize, setGhostSize] = useState(null);
+
+  useEffect(() => {
+    const square = pieceRef.current?.parentElement;
+    if (!square) return;
+
+    const updateGhostSize = () => {
+      setGhostSize(square.getBoundingClientRect().width);
+    };
+
+    updateGhostSize();
+    const resizeObserver = new ResizeObserver(updateGhostSize);
+    resizeObserver.observe(square);
+
+    return () => resizeObserver.disconnect();
+  }, []);
 
   const selectPiece = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -163,7 +179,6 @@ function ChessPiece({ piece, canInteract, isSelected, onSelect }) {
       y: e.clientY - rect.top,
     };
     setPosition({ x: rect.left, y: rect.top });
-    setGhostSize(rect.width);
     onSelect(e);
   };
 
@@ -184,6 +199,7 @@ function ChessPiece({ piece, canInteract, isSelected, onSelect }) {
 
   return (
     <div
+      ref={pieceRef}
       animate={{ rotate: 0 }}
       whileHover={
         canInteract ? { rotate: [0, -10, 10, -10, 10, 0] } : undefined
@@ -195,8 +211,9 @@ function ChessPiece({ piece, canInteract, isSelected, onSelect }) {
         cursor: canInteract ? "pointer" : "default",
         left: `${position.x}px`,
         top: `${position.y}px`,
-        width: ghostSize,
-        height: ghostSize,
+        ...(isSelected && ghostSize
+          ? { width: ghostSize, height: ghostSize }
+          : {}),
       }}
     ></div>
   );
