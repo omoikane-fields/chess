@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { getCandidateMoves } from "../objects/pieces.js";
+import { getCandidateMoves, putsKingInCheck } from "../objects/pieces.js";
 
 // Board component
 // This represent the standard 8x8 chess board
@@ -23,8 +23,19 @@ export function Board({ currentColor, squares, lastMove, recordMove }) {
           lastMove,
         });
 
+        // remove moves that would put the king in check
+        const filteredMoves = availableMoves.filter(
+          (move) =>
+            !putsKingInCheck({
+              board: squares,
+              piece,
+              from: position,
+              to: move.to,
+            }),
+        );
+
         setSelectedSquare(position);
-        setAvailableMoves(availableMoves);
+        setAvailableMoves(filteredMoves);
 
         return;
       }

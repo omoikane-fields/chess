@@ -120,6 +120,53 @@ function followDirection({ board, piece, from, direction, limit = Infinity }) {
  *   - if king is in check, only allow moves that would get the king out of check.
  *
  */
+export function putsKingInCheck({ board, piece, from, to }) {
+  // Create a copy of the board to simulate the move
+  const simulatedBoard = board.map((column) => column.slice());
+
+  // Move the piece to the new position
+  simulatedBoard[to.x][to.y] = piece;
+  simulatedBoard[from.x][from.y] = null;
+
+  // Find the king's position
+  const kingPosition = findKingPosition(simulatedBoard, piece.color);
+
+  // Check if any enemy piece can attack the king's position
+  for (let x = 0; x < 8; x++) {
+    for (let y = 0; y < 8; y++) {
+      const enemyPiece = simulatedBoard[x][y];
+      if (enemyPiece && enemyPiece.color !== piece.color) {
+        const candidateMoves = getCandidateMoves(
+          simulatedBoard,
+          enemyPiece,
+          { x, y },
+          { currentColor: enemyPiece.color, lastMove: null },
+        );
+        if (
+          candidateMoves.some(
+            (move) =>
+              move.to.x === kingPosition.x && move.to.y === kingPosition.y,
+          )
+        ) {
+          return true; // King is in check
+        }
+      }
+    }
+  }
+
+  return false; // King is not in check
+}
+
+function findKingPosition(board, color) {
+  for (let x = 0; x < 8; x++) {
+    for (let y = 0; y < 8; y++) {
+      const piece = board[x][y];
+      if (piece && piece.type === "king" && piece.color === color) {
+        return { x, y };
+      }
+    }
+  }
+}
 
 function orthogonalRay({ board, piece, from, limit }) {
   const directions = [
