@@ -1,5 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { getCandidateMoves, putsKingInCheck } from "../objects/pieces.js";
+import {
+  getCandidateMoves,
+  isKingInCheck,
+  putsKingInCheck,
+  findKingPosition,
+} from "../objects/pieces.js";
 
 // Board component
 // This represent the standard 8x8 chess board
@@ -79,6 +84,11 @@ export function Board({ currentColor, squares, lastMove, recordMove }) {
     }
 
     recordMove(nextSquares, selectedMove);
+    checkOrCheckmate(
+      nextSquares,
+      movedPiece.color === "white" ? "black" : "white",
+    );
+
     setAvailableMoves([]);
     setSelectedSquare(null);
   }
@@ -250,4 +260,43 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function checkOrCheckmate(board, color) {
+  const isCheck = isKingInCheck(board, color);
+  if (!isCheck) return;
+
+  // Not restricted to just king's moves. Check if any piece of the same color has legal moves.
+  const kingPosition = findKingPosition(board, color);
+  const hasLegalMoves = board.some((column, x) =>
+    column.some((piece, y) => {
+      if (piece && piece.color === color) {
+        const candidateMoves = getCandidateMoves(
+          board,
+          piece,
+          { x, y },
+          {
+            currentColor: color,
+            lastMove: null,
+          },
+        );
+        return candidateMoves.some(
+          (move) =>
+            !putsKingInCheck({
+              board,
+              piece,
+              from: { x, y },
+              to: move.to,
+            }),
+        );
+      }
+      return false;
+    }),
+  );
+
+  if (!hasLegalMoves) {
+    alert(`Checkmate! ${color === "white" ? "Black" : "White"} wins!`);
+  } else {
+    alert(`Check! ${color === "white" ? "White" : "Black"} is in check.`);
+  }
 }

@@ -131,13 +131,25 @@ export function putsKingInCheck({ board, piece, from, to }) {
   // Find the king's position
   const kingPosition = findKingPosition(simulatedBoard, piece.color);
 
+  if (!kingPosition) return false;
+
+  return isKingInCheck(simulatedBoard, piece.color, kingPosition);
+}
+
+export function isKingInCheck(
+  board,
+  color,
+  kingPosition = findKingPosition(board, color),
+) {
+  if (!kingPosition) return false;
+
   // Check if any enemy piece can attack the king's position
   for (let x = 0; x < 8; x++) {
     for (let y = 0; y < 8; y++) {
-      const enemyPiece = simulatedBoard[x][y];
-      if (enemyPiece && enemyPiece.color !== piece.color) {
+      const enemyPiece = board[x][y];
+      if (enemyPiece && enemyPiece.color !== color) {
         const candidateMoves = getCandidateMoves(
-          simulatedBoard,
+          board,
           enemyPiece,
           { x, y },
           { currentColor: enemyPiece.color, lastMove: null },
@@ -157,7 +169,7 @@ export function putsKingInCheck({ board, piece, from, to }) {
   return false; // King is not in check
 }
 
-function findKingPosition(board, color) {
+export function findKingPosition(board, color) {
   for (let x = 0; x < 8; x++) {
     for (let y = 0; y < 8; y++) {
       const piece = board[x][y];
